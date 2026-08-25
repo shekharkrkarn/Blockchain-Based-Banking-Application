@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blockchain Banking Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body{
+            background: radial-gradient(circle at top, #1b2735, #090a0f);
+            color: white;
+            min-height: 100vh;
+            font-family: "Segoe UI", sans-serif;
+        }
+        .navbar{
+            background: linear-gradient(90deg,#0f2027,#203a43,#2c5364);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+        }
+        .glass-card{
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        label{
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        .form-control{
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+        .form-control:focus{
+            background: rgba(0,0,0,0.8);
+            color: white;
+            border-color: #00d4ff;
+            box-shadow: none;
+        }
+        .btn-custom{
+            background: linear-gradient(135deg,#00d4ff,#0072ff);
+            border: none;
+            font-weight: 600;
+            color: black;
+            margin-top: 15px;
+        }
+        .btn-custom:hover{
+            background: linear-gradient(135deg,#0072ff,#00d4ff);
+            color: white;
+        }
+        /* ===== TABLE STYLING ===== */
+        .table-container{
+            overflow-x: auto;
+            max-height: 450px;
+            margin-top: 15px;
+        }
+        table{
+            table-layout: fixed;
+            width: 100%;
+            font-size: 14px;
+        }
+        th{
+            background: #00d4ff !important;
+            color: black !important;
+            font-weight: 600;
+            text-align: center;
+        }
+        td{
+            vertical-align: top;
+        }
+        .hash-text{
+            font-size: 11px;
+            word-break: break-all;
+        }
+        /* ===== INNER TRANSACTION TABLE FIX ===== */
+        .inner-table th,
+        .inner-table td{
+            color: white !important;                 /* FIX: text white */
+            background-color: rgba(0,0,0,0.45) !important;
+        }
+        .inner-table th{
+            width: 40%;
+            font-weight: 600;
+        }
+        .inner-table{
+            border-color: rgba(255,255,255,0.4);
+        }
+    </style>
+</head>
+<body>
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark px-4">
+    <span class="navbar-brand fw-bold">
+        🔐 Blockchain Banking Application
+    </span>
+</nav>
+<div class="container py-5">
+    <!-- PAYMENT FORM -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-7">
+            <div class="glass-card">
+                <h4 class="text-center mb-3">💳 New Payment Transaction</h4>
+                <form method="POST" action="/payment">
+
+                    <label>Bank Name</label>
+                    <input type="text" name="Bank_Name" class="form-control" required>
+
+                    <label>UPI ID</label>
+                    <input type="text" name="UPI_ID" class="form-control" required>
+
+                    <label>Sender Account Number</label>
+                    <input type="text" name="Sender_Account" class="form-control" required>
+
+                    <label>Transaction Amount (₹)</label>
+                    <input type="number" name="Transaction" class="form-control" required>
+
+                    <label>Receiver Account Number</label>
+                    <input type="text" name="Holder_Account" class="form-control" required>
+
+                    <button class="btn btn-custom w-100">
+                        Submit Transaction
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- BLOCKCHAIN LEDGER -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card">
+                <h4 class="text-center mb-3">📜 Blockchain Ledger</h4>
+                <div class="table-container">
+                    <table class="table table-dark table-bordered text-center align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width:5%">Index</th>
+                                <th style="width:45%">Transaction Details</th>
+                                <th style="width:25%">Hash</th>
+                                <th style="width:25%">Previous Hash</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for block in chain %}
+                            <tr>
+                                <td><b>{{ block.index }}</b></td>
+                                <!-- TRANSACTION DETAILS -->
+                                <td class="text-start">
+                                    {% if block.index == 0 %}
+                                        <span class="text-info fw-bold">
+                                            Genesis Block
+                                        </span>
+                                    {% else %}
+                                    <table class="table table-sm table-bordered inner-table mb-0">
+                                        <tr>
+                                            <th>Bank Name</th>
+                                            <td>{{ block.data.Bank_Name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>UPI ID</th>
+                                            <td>{{ block.data.UPI_ID }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Sender A/c</th>
+                                            <td>{{ block.data.Sender_Account }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Amount (₹)</th>
+                                            <td>{{ block.data.Transaction }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Receiver A/c</th>
+                                            <td>{{ block.data.Holder_Account }}</td>
+                                        </tr>
+                                    </table>
+                                    {% endif %}
+                                </td>
+                                <!-- HASH -->
+                                <td class="text-success hash-text">
+                                    {{ block.hash }}
+                                </td>
+                                <!-- PREVIOUS HASH -->
+                                <td class="text-warning hash-text">
+                                    {{ block.previous_hash }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
